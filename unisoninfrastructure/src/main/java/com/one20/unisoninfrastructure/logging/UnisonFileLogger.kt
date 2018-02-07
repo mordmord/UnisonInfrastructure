@@ -1,6 +1,7 @@
 package com.one20.unisoninfrastructure.logging
 
 import java.io.File
+import java.io.FileWriter
 import java.io.PrintWriter
 
 
@@ -42,7 +43,7 @@ open class UnisonFileLogger(filePath: String) : UnisonLogger() {
         }
 
         if(mPrintWriter == null) {
-            mPrintWriter = PrintWriter(mFile)
+            mPrintWriter = PrintWriter(FileWriter(mFile, true))
         }
     }
 
