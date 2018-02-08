@@ -1,9 +1,9 @@
 package com.one20.unisoninfrastructure.logging
 
+import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import java.io.PrintWriter
-
 
 
 /**
@@ -22,9 +22,11 @@ open class UnisonFileLogger(filePath: String) : UnisonLogger() {
     private var mFile: File? = null
 
     /**
-     * Instance for writing lines to log file
+     * Writer instances for writing to file
      */
-    private var mPrintWriter: PrintWriter? = null
+    private var printWriter: PrintWriter? = null
+    private var fileWriter: FileWriter? = null
+    private var bufferedWriter: BufferedWriter? = null
 
 
     init {
@@ -35,30 +37,37 @@ open class UnisonFileLogger(filePath: String) : UnisonLogger() {
     /**
      * Checks file existence and creates new file if doesn't already exist
      */
-    private fun checkFile() {
+    private fun checkInit() {
         mFile?.let {
             if(!mFile!!.exists()) {
                 mFile!!.createNewFile()
             }
         }
 
-        if(mPrintWriter == null) {
-            mPrintWriter = PrintWriter(FileWriter(mFile, true))
-        }
+        fileWriter = FileWriter(mFile, true)
+        bufferedWriter = BufferedWriter(fileWriter)
+        printWriter = PrintWriter(bufferedWriter)
     }
 
 
     override fun log(level: Int, message: String) {
-        checkFile()
+        checkInit()
 
-        mPrintWriter?.println(message)
-        mPrintWriter?.close()
+        printWriter?.println(message)
+        close()
     }
 
-    override fun log(level: Int, throwable: Throwable) {
-        checkFile()
 
-        mPrintWriter?.println(throwable.toString())
-        mPrintWriter?.close()
+    override fun log(level: Int, throwable: Throwable) {
+        checkInit()
+
+        printWriter?.println(throwable.toString())
+        close()
+    }
+
+    private fun close() {
+        printWriter?.close()
+        bufferedWriter?.close()
+        fileWriter?.close()
     }
 }
